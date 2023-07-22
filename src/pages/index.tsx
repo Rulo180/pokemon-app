@@ -17,13 +17,26 @@ const Home = ({ version }: { version: string }) => {
   const [search, setSearch] = useState('');
   const [view, setView] = useState<Views>('cards');
 
-  const { data: response } = useSWR<AxiosResponse<SerializedPokemon[]>>(`pokemons-${search}`, () =>
-    axios(`/api/pokemons`),
+  const { data: response } = useSWR<AxiosResponse<SerializedPokemon[]>>(
+    `pokemons-${search}`,
+    () => {
+      if (search) {
+        const regex = new RegExp(search, 'i');
+        return axios(`/api/pokemons?name=${encodeURIComponent(regex.source)}`);
+      }
+      return axios(`/api/pokemons`);
+    },
   );
 
   const handleSearch = useCallback((event) => {
     setView('cards');
     setSearch(event.target.value);
+  }, []);
+
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
   }, []);
 
   const renderContent = () => {
@@ -55,6 +68,7 @@ const Home = ({ version }: { version: string }) => {
                 type="text"
                 placeholder="Search for a pokemon"
                 onChange={handleSearch}
+                  onKeyDown={handleKeyDown}
                 value={search}
               />
             </div>
