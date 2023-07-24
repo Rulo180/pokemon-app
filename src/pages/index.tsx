@@ -47,7 +47,24 @@ const Home = ({ version }: { version: string }) => {
         </div>
       );
     }
-    return view === 'cards' ? <Cards data={response.data} /> : <Table />;
+    return view === 'cards' ? (
+      <Cards data={response.data} />
+    ) : (
+      <Table
+        data={response.data}
+        headers={[
+          'image',
+          'name',
+          'type',
+          'HP',
+          'Attack',
+          'Defense',
+          'Sp. Attack',
+          'Sp. Defense',
+          'Speed',
+        ]}
+      />
+    );
   };
 
   return (
