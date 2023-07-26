@@ -25,7 +25,7 @@ export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Prop
         className={`p-4 pt-0 pb-3 h-full ${isSortable ? 'cursor-pointer' : ''}`}
         scope="col"
         onClick={() => {
-          if (onSort) {
+          if (onSort && isSortable) {
             onSort(column);
           }
         }}
