@@ -1,4 +1,13 @@
-export const POKEMON_COLUMNS = {
+type PokemonColumn = {
+  label: string;
+  isSortable: boolean;
+};
+
+type PokemonColumns = {
+  [key: string]: PokemonColumn;
+};
+
+export const POKEMON_COLUMNS: PokemonColumns = {
   id: {
     label: 'ID',
     isSortable: false,

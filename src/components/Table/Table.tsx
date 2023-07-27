@@ -1,102 +1,77 @@
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Chip } from '@/components/Chip';
 import { SerializedPokemon } from '@/types';
-import { fadeInRows } from '@/utils/animations';
+import {
+  convertKeysToCamelCase,
+  flattenObject,
+  orderObjectProperties,
+  sortColumns,
+} from '@/utils/transformations';
 
-import CaretDownIcon from '../CaretDownIcon';
-import CaretUpIcon from '../CaretUpIcon';
-import { POKEMON_COLUMNS } from '../constants';
+import EmptyState from './EmptyState';
+import { TableImplementetion } from './TableImplementation';
 
 export type Props = {
   data: SerializedPokemon[];
   columns: string[];
-  sortColumn: string;
-  sortDirection: 'asc' | 'desc';
-  onSort: (arg0: string) => void;
 };
 
-export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Props) => {
-  const tableHeaders = columns.map((column) => {
-    const { isSortable, label } = POKEMON_COLUMNS[column];
-    return (
-      <th
-        key={column}
-        className={`p-4 pt-0 pb-3 h-full ${isSortable ? 'cursor-pointer' : ''}`}
-        scope="col"
-        onClick={() => {
-          if (onSort && isSortable) {
-            onSort(column);
-          }
-        }}
-      >
-        <div className="flex items-center">
-          {isSortable ? (
-            <div className="flex flex-col">
-              <CaretUpIcon
-                color={sortColumn === column && sortDirection === 'asc' ? undefined : 'grey'}
-                width={12}
-                height={12}
-              />
-              <CaretDownIcon
-                color={sortColumn === column && sortDirection === 'desc' ? undefined : 'grey'}
-                width={12}
-                height={12}
-              />
-            </div>
-          ) : null}
-          {label}
-        </div>
-      </th>
-    );
-  });
+export type SortDirections = 'asc' | 'desc' | '';
 
-  // const sortIcon = sortDirection === 'asc' ? <CaretUpIcon /> : <CaretDownIcon />;
+export const Table = ({ data, columns }: Props) => {
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortDirection, setSortDirection] = useState<SortDirections>('asc');
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      let newTableData = data.map((pokemon) => {
+        const flattenedPokemon = flattenObject(pokemon);
+        const formatedPokemon = Object.keys(flattenedPokemon).reduce((acc, key) => {
+          const formatedKey = convertKeysToCamelCase(key);
+          if (flattenedPokemon.hasOwnProperty(key)) {
+            acc[formatedKey] = flattenedPokemon[key];
+          }
+          return acc;
+        }, {});
+        return orderObjectProperties(formatedPokemon, columns);
+      });
+      if (sortColumn) {
+        newTableData = sortColumns(newTableData, sortColumn, sortDirection);
+      }
+      setTableData(newTableData);
+    }
+  }, [columns, data, sortColumn, sortDirection]);
+
+  const handleOnSort = (column: string) => {
+    if (column === sortColumn) {
+      setSortDirection((currentSortDirection) => {
+        if (currentSortDirection === 'asc') return 'desc';
+        if (currentSortDirection === 'desc') return '';
+        return 'asc';
+      });
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        title="No data to display"
+        message="Oops! Something went wrong. Please try again or search for something else."
+      />
+    );
+  }
+
   return (
-    <div className="">
-      <table className="table-fixed w-full border-collapse ">
-        <thead className="bg-slate-300">
-          <tr className="text-center">{tableHeaders}</tr>
-        </thead>
-        <tbody>
-          {data.map((pokemon, index) => {
-            return (
-              <Link key={`${pokemon.id}-row`} href={`/pokemon/${pokemon.name}`}>
-                <motion.tr
-                  key={index}
-                  className={`bg-white text-center ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-slate-100'
-                  }`}
-                  variants={fadeInRows}
-                >
-                  {Object.keys(pokemon).map((key) => (
-                    <td key={`${pokemon}-${key}-cell`} className="p-4">
-                      {key === 'image' ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={pokemon[key] as string}
-                          aria-label={pokemon.name}
-                          alt={pokemon.name as string}
-                        />
-                      ) : key === 'type' ? (
-                        pokemon[key].map((type: string) => (
-                          <div key={`${pokemon.id}-${type}`} className="py-1">
-                            <Chip size="sm">{type}</Chip>
-                          </div>
-                        ))
-                      ) : (
-                        pokemon[key]
-                      )}
-                    </td>
-                  ))}
-                </motion.tr>
-              </Link>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <TableImplementetion
+      data={tableData}
+      columns={columns}
+      sortColumn={sortColumn}
+      sortDirection={sortDirection}
+      onSort={handleOnSort}
+    />
   );
 };

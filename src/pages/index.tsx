@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { motion } from 'framer-motion';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import { Table } from '@/components/Table/Table';
@@ -11,15 +11,8 @@ import { Container } from '@/components/Container';
 import { Spinner } from '@/components/Spinner';
 import { Table } from '@/components/Table/Table';
 import { SerializedPokemon } from '@/types';
-import {
-  convertKeysToCamelCase,
-  flattenObject,
-  orderObjectProperties,
-  sortColumns,
-} from '@/utils/transformations';
 
 type Views = 'cards' | 'table' | 'list';
-type SortDirections = 'asc' | 'desc';
 
 const Home = ({ version }: { version: string }) => {
   const [search, setSearch] = useState('');
@@ -55,39 +48,6 @@ const Home = ({ version }: { version: string }) => {
     [],
   );
 
-  useEffect(() => {
-    if (response?.data) {
-      let newTableData = response?.data.map((pokemon) => {
-        const flattenedPokemon = flattenObject(pokemon);
-        const formatedPokemon = Object.keys(flattenedPokemon).reduce((acc, key) => {
-          const formatedKey = convertKeysToCamelCase(key);
-          if (flattenedPokemon.hasOwnProperty(key)) {
-            acc[formatedKey] = flattenedPokemon[key];
-          }
-          return acc;
-        }, {});
-        return orderObjectProperties(formatedPokemon, columns);
-      });
-      if (sortColumn) {
-        newTableData = sortColumns(newTableData, sortColumn, sortDirection);
-      }
-      setTableData(newTableData);
-    }
-  }, [columns, response?.data, sortColumn, sortDirection]);
-
-  const handleOnSort = (column: string) => {
-    if (column === sortColumn) {
-      setSortDirection((currentSortDirection) => {
-        if (currentSortDirection === 'asc') return 'desc';
-        if (currentSortDirection === 'desc') return '';
-        return 'asc';
-      });
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
-  };
-
   const handleSearch = useCallback((event) => {
     setView('cards');
     setSearch(event.target.value);
@@ -110,13 +70,7 @@ const Home = ({ version }: { version: string }) => {
     return view === 'cards' ? (
       <Cards data={response.data} />
     ) : (
-      <Table
-        data={tableData}
-        columns={columns}
-        sortColumn={sortColumn}
-        sortDirection={sortDirection}
-        onSort={handleOnSort}
-      />
+      <Table data={response.data} columns={columns} />
     );
   };
 
