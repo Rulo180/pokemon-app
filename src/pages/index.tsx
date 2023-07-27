@@ -75,12 +75,17 @@ const Home = ({ version }: { version: string }) => {
     }
   }, [columns, response?.data, sortColumn, sortDirection]);
 
-  const handleOnSort = (column) => {
-    const newSortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+  const handleOnSort = (column: string) => {
     if (column === sortColumn) {
-      setSortDirection(newSortDirection);
+      setSortDirection((currentSortDirection) => {
+        if (currentSortDirection === 'asc') return 'desc';
+        if (currentSortDirection === 'desc') return '';
+        return 'asc';
+      });
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
     }
-    setSortColumn(column);
   };
 
   const handleSearch = useCallback((event) => {

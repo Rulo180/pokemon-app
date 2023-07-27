@@ -24,3 +24,14 @@ export const stagger = (staggerChildren = 0.3): Variants => ({
     },
   },
 });
+
+export const fadeInRows = {
+  initial: { opacity: 0, y: -10 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
+  exit: { opacity: 0, y: -10 },
+  // ,
+};

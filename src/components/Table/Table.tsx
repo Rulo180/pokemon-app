@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
 import { Chip } from '@/components/Chip';
 import { SerializedPokemon } from '@/types';
+import { fadeInRows } from '@/utils/animations';
 
 import CaretDownIcon from '../CaretDownIcon';
 import CaretUpIcon from '../CaretUpIcon';
@@ -31,7 +33,6 @@ export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Prop
         }}
       >
         <div className="flex items-center">
-          {label}
           {isSortable ? (
             <div className="flex flex-col">
               <CaretUpIcon
@@ -46,6 +47,7 @@ export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Prop
               />
             </div>
           ) : null}
+          {label}
         </div>
       </th>
     );
@@ -55,16 +57,22 @@ export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Prop
   return (
     <div className="">
       <table className="table-fixed w-full border-collapse ">
-        <thead className="bg-slate-100">
-          <tr className="text-center border-b border-gray-300">{tableHeaders}</tr>
+        <thead className="bg-slate-300">
+          <tr className="text-center">{tableHeaders}</tr>
         </thead>
         <tbody>
-          {data.map((pokemon) => {
+          {data.map((pokemon, index) => {
             return (
               <Link key={`${pokemon.id}-row`} href={`/pokemon/${pokemon.name}`}>
-                <tr className="bg-white text-center">
+                <motion.tr
+                  key={index}
+                  className={`bg-white text-center ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-slate-100'
+                  }`}
+                  variants={fadeInRows}
+                >
                   {Object.keys(pokemon).map((key) => (
-                    <td key={`${pokemon}-${key}-cell`} className="p-4 border-b border-gray-300">
+                    <td key={`${pokemon}-${key}-cell`} className="p-4">
                       {key === 'image' ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -83,7 +91,7 @@ export const Table = ({ data, columns, sortColumn, sortDirection, onSort }: Prop
                       )}
                     </td>
                   ))}
-                </tr>
+                </motion.tr>
               </Link>
             );
           })}
