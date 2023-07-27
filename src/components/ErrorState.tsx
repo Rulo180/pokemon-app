@@ -1,16 +1,16 @@
 import Image from 'next/image';
 import React, { ReactElement } from 'react';
 
-interface EmptyStateProps {
+interface ErrorStateProps {
   title: string;
   message: string | undefined;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ message, title }): ReactElement => {
+const ErrorState: React.FC<ErrorStateProps> = ({ message, title }): ReactElement => {
   return (
     <div className="flex flex-col items-center pb-4 py-6">
-      <div className="pb-4">
-        <Image src="/images/snorlax.png" alt="Snorlax sleeping" width={150} height={100} />
+      <div>
+        <Image src="/images/pikachu-sad.png" alt="Sad pikachu" width={200} height={260} />
       </div>
       <div className="pb-6">
         <h2 className="font-bold">{title}</h2>
@@ -22,4 +22,4 @@ const EmptyState: React.FC<EmptyStateProps> = ({ message, title }): ReactElement
   );
 };
 
-export default EmptyState;
+export default ErrorState;

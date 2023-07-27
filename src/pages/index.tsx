@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import { Table } from '@/components/Table/Table';
 import { Cards } from '@/components/Cards';
 import { Container } from '@/components/Container';
+import ErrorState from '@/components/ErrorState';
 import { Spinner } from '@/components/Spinner';
 import { Table } from '@/components/Table/Table';
 import { SerializedPokemon } from '@/types';
@@ -21,7 +22,7 @@ const Home = ({ version }: { version: string }) => {
   const [sortDirection, setSortDirection] = useState<SortDirections>('asc');
   const [tableData, setTableData] = useState([]);
 
-  const { data: response } = useSWR<AxiosResponse<SerializedPokemon[]>>(
+  const { data: response, error } = useSWR<AxiosResponse<SerializedPokemon[]>>(
     `pokemons-${search}`,
     () => {
       if (search) {
@@ -60,6 +61,11 @@ const Home = ({ version }: { version: string }) => {
   }, []);
 
   const renderContent = () => {
+    if (error) {
+      return (
+        <ErrorState title="Oops! Something went wrong." message="Please try refreshing the page" />
+      );
+    }
     if (!response) {
       return (
         <div className="flex justify-center">
@@ -94,6 +100,7 @@ const Home = ({ version }: { version: string }) => {
                 onChange={handleSearch}
                   onKeyDown={handleKeyDown}
                 value={search}
+                  disabled={error}
               />
             </div>
             <div className="text-right">
@@ -102,6 +109,7 @@ const Home = ({ version }: { version: string }) => {
                 onClick={() => {
                   setView('cards');
                 }}
+                  disabled={error}
               >
                 Cards
               </button>{' '}
@@ -110,6 +118,7 @@ const Home = ({ version }: { version: string }) => {
                 onClick={() => {
                   setView('table');
                 }}
+                  disabled={error}
               >
                 Table
               </button>

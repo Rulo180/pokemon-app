@@ -42,7 +42,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({
             >
               <div className="flex items-center">
                 {isSortable ? (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col pr-1">
                     <CaretUpIcon
                       color={sortColumn === column && sortDirection === 'asc' ? undefined : 'grey'}
                       width={12}
