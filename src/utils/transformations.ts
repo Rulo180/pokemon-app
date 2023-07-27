@@ -47,15 +47,18 @@ const transformPokemonDataForTable = (data) => {
  * @param {('asc' | 'desc')} sortDirection - The sort direction, either "asc" for ascending or "desc" for descending. Default is "asc".
  * @returns {T[]} - The sorted array of objects.
  */
-const sortColumns = <T extends Record<string, any>>(
+const sortColumns = <T extends Record<string, number>>(
   data: T[],
   sortColumn: keyof T,
-  sortDirection: 'asc' | 'desc' = 'asc',
+  sortDirection: 'asc' | 'desc' | '' = 'asc',
 ): T[] => {
+  if (sortDirection === '') {
+    return data;
+  }
   return data.sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
-    const compareValue = aValue.localeCompare(bValue);
+    const compareValue = aValue - bValue;
 
     return sortDirection === 'asc' ? compareValue : -compareValue;
   });
