@@ -21,6 +21,7 @@ export type Pokemon = {
 };
 
 export type SerializedPokemon = Omit<Pokemon, 'name'> & {
+  id: number;
   image: string;
   name: PokemonName['english'];
 };

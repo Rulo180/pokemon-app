@@ -15,7 +15,7 @@ type TableHeadersProps = {
   columns: string[];
   sortColumn: string;
   sortDirection: 'asc' | 'desc' | '';
-  onSort: (arg0: string) => void;
+  onSort: (arg0: keyof SerializedPokemon | '') => void;
 };
 
 const TableHeaders: React.FC<TableHeadersProps> = ({
@@ -36,7 +36,7 @@ const TableHeaders: React.FC<TableHeadersProps> = ({
               scope="col"
               onClick={() => {
                 if (onSort && isSortable) {
-                  onSort(column);
+                  onSort(column as keyof SerializedPokemon | '');
                 }
               }}
             >
@@ -70,7 +70,7 @@ export type Props = {
   columns: string[];
   sortColumn: string;
   sortDirection: SortDirections;
-  onSort: (arg0: string) => void;
+  onSort: (arg0: keyof SerializedPokemon | '') => void;
 };
 
 export const TableImplementetion = ({
@@ -89,7 +89,7 @@ export const TableImplementetion = ({
         onSort={onSort}
       />
       <tbody>
-        {data.map((pokemon, index) => {
+        {data.map((pokemon: SerializedPokemon, index) => {
           return (
             <Link key={`${pokemon.id}-row`} href={`/pokemon/${pokemon.name}`}>
               <motion.tr

@@ -19,22 +19,23 @@ export type Props = {
 export type SortDirections = 'asc' | 'desc' | '';
 
 export const Table = ({ data, columns }: Props) => {
-  const [sortColumn, setSortColumn] = useState('');
+  const [sortColumn, setSortColumn] = useState<keyof SerializedPokemon | ''>('');
   const [sortDirection, setSortDirection] = useState<SortDirections>('asc');
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState<SerializedPokemon[]>([]);
 
   useEffect(() => {
     if (data) {
-      let newTableData = data.map((pokemon) => {
+      let newTableData: SerializedPokemon[] = data.map((pokemon) => {
         const flattenedPokemon = flattenObject(pokemon);
         const formatedPokemon = Object.keys(flattenedPokemon).reduce((acc, key) => {
           const formatedKey = convertKeysToCamelCase(key);
           if (flattenedPokemon.hasOwnProperty(key)) {
-            acc[formatedKey] = flattenedPokemon[key];
+            acc[formatedKey as keyof typeof acc] =
+              flattenedPokemon[key as keyof typeof flattenedPokemon];
           }
           return acc;
-        }, {});
-        return orderObjectProperties(formatedPokemon, columns);
+        }, {} as Record<keyof SerializedPokemon, any>);
+        return orderObjectProperties(formatedPokemon, columns) as SerializedPokemon;
       });
       if (sortColumn) {
         newTableData = sortColumns(newTableData, sortColumn, sortDirection);
@@ -43,7 +44,7 @@ export const Table = ({ data, columns }: Props) => {
     }
   }, [columns, data, sortColumn, sortDirection]);
 
-  const handleOnSort = (column: string) => {
+  const handleOnSort = (column: keyof SerializedPokemon | '') => {
     if (column === sortColumn) {
       setSortDirection((currentSortDirection) => {
         if (currentSortDirection === 'asc') return 'desc';

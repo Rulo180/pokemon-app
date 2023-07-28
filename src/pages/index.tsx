@@ -2,10 +2,9 @@ import axios, { AxiosResponse } from 'axios';
 import { motion } from 'framer-motion';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
-import { Table } from '@/components/Table/Table';
 import { Cards } from '@/components/Cards';
 import { Container } from '@/components/Container';
 import ErrorState from '@/components/ErrorState';
@@ -18,9 +17,6 @@ type Views = 'cards' | 'table' | 'list';
 const Home = ({ version }: { version: string }) => {
   const [search, setSearch] = useState('');
   const [view, setView] = useState<Views>('cards');
-  const [sortColumn, setSortColumn] = useState('');
-  const [sortDirection, setSortDirection] = useState<SortDirections>('asc');
-  const [tableData, setTableData] = useState([]);
 
   const { data: response, error } = useSWR<AxiosResponse<SerializedPokemon[]>>(
     `pokemons-${search}`,
@@ -49,12 +45,12 @@ const Home = ({ version }: { version: string }) => {
     [],
   );
 
-  const handleSearch = useCallback((event) => {
+  const handleSearch = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setView('cards');
     setSearch(event.target.value);
   }, []);
 
-  const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
     }
@@ -98,9 +94,9 @@ const Home = ({ version }: { version: string }) => {
                 type="text"
                 placeholder="Search for a pokemon"
                 onChange={handleSearch}
-                  onKeyDown={handleKeyDown}
+                onKeyDown={handleKeyDown}
                 value={search}
-                  disabled={error}
+                disabled={error}
               />
             </div>
             <div className="text-right">
@@ -109,7 +105,7 @@ const Home = ({ version }: { version: string }) => {
                 onClick={() => {
                   setView('cards');
                 }}
-                  disabled={error}
+                disabled={error}
               >
                 Cards
               </button>{' '}
@@ -118,7 +114,7 @@ const Home = ({ version }: { version: string }) => {
                 onClick={() => {
                   setView('table');
                 }}
-                  disabled={error}
+                disabled={error}
               >
                 Table
               </button>

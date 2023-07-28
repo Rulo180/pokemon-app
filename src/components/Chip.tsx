@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 type Props = {
   children: ReactNode;
-  size: 'sm' | 'lg';
+  size?: 'sm' | 'lg';
 };
 
 export const Chip = ({ children, size = 'lg' }: Props) => {
